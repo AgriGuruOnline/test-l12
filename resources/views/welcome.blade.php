@@ -407,6 +407,12 @@
             box-shadow: 0 0 0 4px hsla(343, 75%, 50%, 0.18) !important;
         }
 
+        .options-grid.form-input-error {
+            border: 1.5px solid var(--text-error) !important;
+            border-radius: 14px;
+            padding: 0.5rem;
+        }
+
         /* Choice Cards / Options Grid */
         .options-grid {
             display: flex;

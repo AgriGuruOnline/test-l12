@@ -8,7 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Gujarati:wght@400;600;700&family=Noto+Sans:wght@400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <!-- jQuery (local with relative path for reliable loading on any domain) -->
+    <script src="/js/jquery.min.js"></script>
     <style>
         :root {
             /* Light Theme Palette - HSL Tailored */
@@ -483,16 +484,15 @@
 
         /* Submit Action Area */
         .submit-section {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: var(--card-shadow);
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 1rem;
+            margin-top: 2.5rem;
+            border-top: 1px solid var(--card-border);
+            padding-top: 2rem;
+            width: 100%;
         }
 
         .submit-btn {
@@ -540,20 +540,35 @@
         /* Responsive Breakpoints */
         @media (max-width: 768px) {
             body {
-                padding: 1rem 0.5rem;
+                padding: 1rem 0.75rem;
             }
             .form-grid {
                 grid-template-columns: 1fr;
                 gap: 1.25rem;
             }
-            .half-width {
+            .half-width,
+            .full-width {
                 grid-column: span 1;
             }
             .section-card {
                 padding: 1.5rem 1.25rem;
+                border-radius: 20px;
+                gap: 1.5rem;
             }
             .form-header-card {
                 padding: 1.75rem 1.25rem;
+                border-radius: 20px;
+            }
+            .form-header-card h1 {
+                font-size: 1.6rem;
+                letter-spacing: -0.02em;
+            }
+            .form-header-card p {
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
+            .section-title {
+                font-size: 1.1rem;
             }
             .choice-card {
                 flex: 1 1 calc(50% - 0.6rem);
@@ -566,10 +581,35 @@
             }
             .top-bar {
                 flex-direction: column;
-                align-items: stretch;
+                align-items: center;
+                text-align: center;
+                padding: 1rem;
+            }
+            .bar-left {
+                justify-content: center;
+                width: 100%;
+            }
+            .bar-right {
+                flex-direction: column;
+                width: 100%;
+                gap: 0.75rem;
             }
             .switcher-group {
+                width: 100%;
                 justify-content: center;
+            }
+            .switch-btn {
+                flex: 1;
+                justify-content: center;
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+            .form-input {
+                font-size: 16px; /* Prevents auto-zooming on iOS */
+                padding: 0.75rem 0.9rem;
+            }
+            .submit-btn {
+                max-width: 100%;
             }
         }
         .error-message {
@@ -591,6 +631,451 @@
         .form-label.label-error {
             color: var(--text-error);
         }
+
+        /* Confirmation Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 680px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--card-shadow), 0 24px 60px -15px rgba(0, 0, 0, 0.3);
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(180deg, var(--card-bg) 0%, var(--bg-body) 100%);
+        }
+
+        .modal-title-area {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            text-align: left;
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-title);
+            letter-spacing: -0.02em;
+            margin: 0;
+        }
+
+        .modal-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close-btn:hover {
+            background: var(--toggle-bg);
+            color: var(--text-title);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            max-height: 55vh;
+            scrollbar-width: thin;
+            scrollbar-color: var(--toggle-border) transparent;
+            text-align: left;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background-color: var(--toggle-border);
+            border-radius: 99px;
+        }
+
+        .summary-part-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .summary-section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--section-num-bg);
+            margin-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--card-border);
+            padding-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .summary-item {
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            transition: var(--transition);
+        }
+
+        .summary-item:hover {
+            border-color: var(--pill-active-border);
+            background: var(--pill-active-bg);
+        }
+
+        .summary-item-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .summary-item-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-title);
+            word-break: break-word;
+        }
+
+        .summary-item-empty {
+            opacity: 0.65;
+            background: hsla(215, 16%, 47%, 0.03);
+        }
+
+        .summary-item-empty .summary-item-value {
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            padding: 1.25rem 2rem;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            background: linear-gradient(0deg, var(--card-bg) 0%, var(--bg-body) 100%);
+        }
+
+        .modal-btn {
+            padding: 0.75rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+        }
+
+        .modal-btn-cancel {
+            background: var(--toggle-bg);
+            color: var(--text-body);
+            border: 1px solid var(--toggle-border);
+        }
+
+        .modal-btn-cancel:hover {
+            background: var(--toggle-active-bg);
+            color: var(--text-title);
+        }
+
+        .modal-btn-submit {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            box-shadow: 0 4px 12px hsla(243, 75%, 59%, 0.2);
+        }
+
+        .modal-btn-submit:hover {
+            background: var(--btn-hover);
+            transform: translateY(-1px);
+        }
+
+        .modal-btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Spinner for Loading State */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid currentColor;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 0.6s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .input-loader {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--pill-active-border);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            box-sizing: border-box;
+            animation: rotation 0.6s linear infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+
+
+        /* Premium Toast Styles */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 420px;
+            width: calc(100vw - 4rem);
+            pointer-events: none;
+        }
+
+        .toast-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.25), var(--card-shadow);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+            transform: translateX(120%);
+            opacity: 0;
+            pointer-events: auto;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, margin 0.3s ease;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            text-align: left;
+        }
+
+        .toast-card.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast-card.hide {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+
+        .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .toast-card.success {
+            border-left: 4px solid hsl(142, 72%, 29%);
+        }
+        [data-theme="dark"] .toast-card.success {
+            border-left: 4px solid hsl(142, 71%, 45%);
+        }
+        .toast-card.success .toast-icon {
+            color: hsl(142, 72%, 29%);
+            background: hsla(142, 72%, 29%, 0.1);
+        }
+        [data-theme="dark"] .toast-card.success .toast-icon {
+            color: hsl(142, 71%, 45%);
+            background: hsla(142, 71%, 45%, 0.15);
+        }
+
+        .toast-card.error {
+            border-left: 4px solid var(--text-error);
+        }
+        .toast-card.error .toast-icon {
+            color: var(--text-error);
+            background: hsla(343, 75%, 50%, 0.1);
+        }
+        [data-theme="dark"] .toast-card.error .toast-icon {
+            background: hsla(343, 85%, 65%, 0.15);
+        }
+
+        .toast-card.info {
+            border-left: 4px solid hsl(200, 80%, 40%);
+        }
+        .toast-card.info .toast-icon {
+            color: hsl(200, 80%, 40%);
+            background: hsla(200, 80%, 40%, 0.1);
+        }
+        [data-theme="dark"] .toast-card.info .toast-icon {
+            color: hsl(200, 85%, 60%);
+            background: hsla(200, 85%, 60%, 0.15);
+        }
+
+        .toast-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            flex-grow: 1;
+        }
+
+        .toast-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-title);
+        }
+
+        .toast-message {
+            font-size: 0.85rem;
+            color: var(--text-body);
+            line-height: 1.4;
+        }
+
+        .toast-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            margin-top: 2px;
+        }
+
+        .toast-close-btn:hover {
+            background: var(--toggle-bg);
+            color: var(--text-title);
+        }
+
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--pill-active-border);
+            width: 100%;
+            transform-origin: left;
+        }
+        
+        .toast-card.success .toast-progress {
+            background: hsl(142, 71%, 45%);
+        }
+        .toast-card.error .toast-progress {
+            background: var(--text-error);
+        }
+        .toast-card.info .toast-progress {
+            background: hsl(200, 85%, 60%);
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-footer {
+                flex-direction: column-reverse;
+                padding: 1rem 1.5rem;
+            }
+            .modal-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .modal-header {
+                padding: 1.25rem 1.5rem;
+            }
+            .modal-body {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .toast-container {
+                top: 1rem;
+                right: 1rem;
+                left: 1rem;
+                width: calc(100vw - 2rem);
+            }
+        }
     </style>
 </head>
 <body>
@@ -605,6 +1090,12 @@
             </span>
         </div>
         <div class="bar-right">
+            <!-- Download Data Button -->
+            <a href="/download-data?lang=gu" class="btn-back" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-body); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition); margin-right: 0.25rem;" id="nav-download-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--section-num-bg);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <span data-localize="nav_download_data">ડાઉનલોડ કરો</span>
+            </a>
+
             <!-- Language Switcher -->
             <div class="switcher-group" id="lang-switcher">
                 <button class="switch-btn" data-lang="gu">ગુજરાતી</button>
@@ -626,8 +1117,7 @@
 
     <!-- Banner Card -->
     <div class="form-header-card">
-        <h1 data-localize="form_title">વસ્તી ગણતરી માટેના ૩૪ પ્રશ્નોની યાદી</h1>
-        <p data-localize="form_desc">રાષ્ટ્રીય જનગણના પત્રક પૂર્ણ કરવા માટે નીચે આપેલ તમામ ૩૪ પ્રશ્નોના જવાબો ચોકસાઈપૂર્વક ભરો.</p>
+        <h1 data-localize="form_title">વસ્તી ગણતરી માટેના ૩૪ પ્રશ્નોની યાદી</h1>        
         
         <!-- Field Progress Tracker -->
         <div class="progress-container">
@@ -656,13 +1146,11 @@
     <!-- Main Registration Form -->
     <form id="census-form" class="census-form" action="#" method="POST" novalidate>
         @csrf
+        <input type="hidden" name="record_id" id="record-id" value="">
+        <input type="hidden" name="mode" id="form-mode" value="house">
         
-        <!-- SECTION 1: Administrative Details -->
+        <!-- Main Form Card -->
         <div class="section-card">
-            <div class="section-header">
-                <div class="section-number">1</div>
-                <div class="section-title" data-localize="sec_1_title">વહીવટી વિગતો (Administrative Details)</div>
-            </div>
             <div class="form-grid">
                 <!-- 1. Line No -->
                 <div class="form-group half-width">
@@ -679,7 +1167,10 @@
                         <span class="question-number">2</span>
                         <span data-localize="q2_label">મકાન નં:</span>
                     </label>
-                    <input type="text" id="q2" name="house_no" class="form-input tracking-input" placeholder="e.g. A-102">
+                    <div style="position: relative; width: 100%;">
+                        <input type="text" id="q2" name="house_no" class="form-input tracking-input" placeholder="e.g. A-102" style="padding-right: 2.5rem;">
+                        <div id="house-loader" class="input-loader" style="display: none;"></div>
+                    </div>
                 </div>
 
                 <!-- 3. Census House No -->
@@ -691,33 +1182,6 @@
                     <input type="text" id="q3" name="census_house_no" class="form-input tracking-input" placeholder="e.g. CH-990">
                 </div>
 
-                <!-- 9. Household No -->
-                <div class="form-group half-width">
-                    <label class="form-label" for="q9">
-                        <span class="question-number">9</span>
-                        <span data-localize="q9_label">કુટુંબ નં:</span>
-                    </label>
-                    <input type="number" id="q9" name="household_no" class="form-input tracking-input" placeholder="e.g. 15">
-                </div>
-
-                <!-- 34. Mobile No -->
-                <div class="form-group full-width">
-                    <label class="form-label" for="q34">
-                        <span class="question-number">34</span>
-                        <span data-localize="q34_label">મો.નં:</span>
-                    </label>
-                    <input type="tel" id="q34" name="mobile_no" class="form-input tracking-input" placeholder="e.g. 9876543210">
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 2: Housing & Facilities Details -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-number">2</div>
-                <div class="section-title" data-localize="sec_2_title">મકાન અને સુવિધાઓની વિગતો (Housing & Facilities)</div>
-            </div>
-            <div class="form-grid">
                 <!-- 4. Floor Material -->
                 <div class="form-group full-width">
                     <label class="form-label">
@@ -868,6 +1332,77 @@
                     </div>
                 </div>
 
+                <!-- 9. Household No -->
+                <div class="form-group half-width">
+                    <label class="form-label" for="q9">
+                        <span class="question-number">9</span>
+                        <span data-localize="q9_label">કુટુંબ નં:</span>
+                    </label>
+                    <input type="number" id="q9" name="household_no" class="form-input tracking-input" placeholder="e.g. 15">
+                </div>
+
+                <!-- 10. Total Persons -->
+                <div class="form-group half-width">
+                    <label class="form-label" for="q10">
+                        <span class="question-number">10</span>
+                        <span data-localize="q10_label">વ્યક્તિ (સભ્યોની સંખ્યા):</span>
+                    </label>
+                    <input type="number" id="q10" name="total_members" class="form-input tracking-input" placeholder="e.g. 5">
+                </div>
+
+                <!-- 11. Head of Household -->
+                <div class="form-group full-width">
+                    <label class="form-label" for="q11">
+                        <span class="question-number">11</span>
+                        <span data-localize="q11_label">મુખ્ય માણસ (કુટુંબના વડાનું નામ):</span>
+                    </label>
+                    <input type="text" id="q11" name="head_name" class="form-input tracking-input" placeholder="e.g. Rameshbhai Patel">
+                </div>
+
+                <!-- 12. Gender of Head -->
+                <div class="form-group full-width">
+                    <label class="form-label">
+                        <span class="question-number">12</span>
+                        <span data-localize="q12_label">જાતિ (મુખ્ય માણસની જાતિ):</span>
+                    </label>
+                    <div class="options-grid">
+                        <label class="choice-card">
+                            <input type="radio" name="head_gender" value="male" class="tracking-input">
+                            <span class="choice-pill" data-localize="q12_opt_1">પુરુષ</span>
+                        </label>
+                        <label class="choice-card">
+                            <input type="radio" name="head_gender" value="female" class="tracking-input">
+                            <span class="choice-pill" data-localize="q12_opt_2">સ્ત્રી</span>
+                        </label>
+                        <label class="choice-card">
+                            <input type="radio" name="head_gender" value="trans" class="tracking-input">
+                            <span class="choice-pill" data-localize="q12_opt_3">ટ્રાન્સ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 13. Social Category / Caste Detail -->
+                <div class="form-group full-width">
+                    <label class="form-label">
+                        <span class="question-number">13</span>
+                        <span data-localize="q13_label">જાતિ વિગત (સામાજિક વર્ગીકરણ):</span>
+                    </label>
+                    <div class="options-grid">
+                        <label class="choice-card">
+                            <input type="radio" name="social_category" value="sc" class="tracking-input">
+                            <span class="choice-pill">SC</span>
+                        </label>
+                        <label class="choice-card">
+                            <input type="radio" name="social_category" value="st" class="tracking-input">
+                            <span class="choice-pill">ST</span>
+                        </label>
+                        <label class="choice-card">
+                            <input type="radio" name="social_category" value="other" class="tracking-input">
+                            <span class="choice-pill" data-localize="other">અન્ય</span>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- 14. Ownership -->
                 <div class="form-group full-width">
                     <label class="form-label">
@@ -901,6 +1436,15 @@
                         <span data-localize="q15_label">ઓરડા:</span>
                     </label>
                     <input type="number" id="q15" name="dwelling_rooms" class="form-input tracking-input" placeholder="e.g. 3">
+                </div>
+
+                <!-- 16. Married Couples -->
+                <div class="form-group half-width">
+                    <label class="form-label" for="q16">
+                        <span class="question-number">16</span>
+                        <span data-localize="q16_label">દંપતિ (પરિણીત યુગલોની સંખ્યા):</span>
+                    </label>
+                    <input type="number" id="q16" name="married_couples" class="form-input tracking-input" placeholder="e.g. 1">
                 </div>
 
                 <!-- 17. Drinking Water Source -->
@@ -1107,96 +1651,7 @@
                         </label>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- SECTION 3: Household Members & Demographics -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-number">3</div>
-                <div class="section-title" data-localize="sec_3_title">કુટુંબના સભ્યો અને વસ્તી વિષયક (Demographics)</div>
-            </div>
-            <div class="form-grid">
-                <!-- 11. Head of Household -->
-                <div class="form-group full-width">
-                    <label class="form-label" for="q11">
-                        <span class="question-number">11</span>
-                        <span data-localize="q11_label">મુખ્ય માણસ (કુટુંબના વડાનું નામ):</span>
-                    </label>
-                    <input type="text" id="q11" name="head_name" class="form-input tracking-input" placeholder="e.g. Rameshbhai Patel">
-                </div>
-
-                <!-- 12. Gender of Head -->
-                <div class="form-group full-width">
-                    <label class="form-label">
-                        <span class="question-number">12</span>
-                        <span data-localize="q12_label">જાતિ (મુખ્ય માણસની જાતિ):</span>
-                    </label>
-                    <div class="options-grid">
-                        <label class="choice-card">
-                            <input type="radio" name="head_gender" value="male" class="tracking-input">
-                            <span class="choice-pill" data-localize="q12_opt_1">પુરુષ</span>
-                        </label>
-                        <label class="choice-card">
-                            <input type="radio" name="head_gender" value="female" class="tracking-input">
-                            <span class="choice-pill" data-localize="q12_opt_2">સ્ત્રી</span>
-                        </label>
-                        <label class="choice-card">
-                            <input type="radio" name="head_gender" value="trans" class="tracking-input">
-                            <span class="choice-pill" data-localize="q12_opt_3">ટ્રાન્સ</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 13. Social Category / Caste Detail -->
-                <div class="form-group full-width">
-                    <label class="form-label">
-                        <span class="question-number">13</span>
-                        <span data-localize="q13_label">જાતિ વિગત (સામાજિક વર્ગીકરણ):</span>
-                    </label>
-                    <div class="options-grid">
-                        <label class="choice-card">
-                            <input type="radio" name="social_category" value="sc" class="tracking-input">
-                            <span class="choice-pill">SC</span>
-                        </label>
-                        <label class="choice-card">
-                            <input type="radio" name="social_category" value="st" class="tracking-input">
-                            <span class="choice-pill">ST</span>
-                        </label>
-                        <label class="choice-card">
-                            <input type="radio" name="social_category" value="other" class="tracking-input">
-                            <span class="choice-pill" data-localize="other">અન્ય</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 10. Total Persons -->
-                <div class="form-group half-width">
-                    <label class="form-label" for="q10">
-                        <span class="question-number">10</span>
-                        <span data-localize="q10_label">વ્યક્તિ (સભ્યોની સંખ્યા):</span>
-                    </label>
-                    <input type="number" id="q10" name="total_members" class="form-input tracking-input" placeholder="e.g. 5">
-                </div>
-
-                <!-- 16. Married Couples -->
-                <div class="form-group half-width">
-                    <label class="form-label" for="q16">
-                        <span class="question-number">16</span>
-                        <span data-localize="q16_label">દંપતિ (પરિણીત યુગલોની સંખ્યા):</span>
-                    </label>
-                    <input type="number" id="q16" name="married_couples" class="form-input tracking-input" placeholder="e.g. 1">
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 4: Assets & Connectivity -->
-        <div class="section-card">
-            <div class="section-header">
-                <div class="section-number">4</div>
-                <div class="section-title" data-localize="sec_4_title">ઘરગથ્થુ અસ્કયામતો અને કનેક્ટિવિટી (Assets & Connectivity)</div>
-            </div>
-            <div class="form-grid">
                 <!-- 26. Radio -->
                 <div class="form-group half-width">
                     <label class="form-label">
@@ -1344,18 +1799,60 @@
                         </label>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Submit Panel -->
-        <div class="submit-section">
-            <button type="submit" class="submit-btn">
-                <span data-localize="submit_button">માહિતી સબમિટ કરો</span>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </button>
+                <!-- 34. Mobile No -->
+                <div class="form-group full-width">
+                    <label class="form-label" for="q34">
+                        <span class="question-number">34</span>
+                        <span data-localize="q34_label">મો.નં:</span>
+                    </label>
+                    <input type="tel" id="q34" name="mobile_no" class="form-input tracking-input" placeholder="e.g. 9876543210" maxlength="10" inputmode="numeric">
+                </div>
+            </div>
+
+            <!-- Submit Panel -->
+            <div class="submit-section">
+                <button type="submit" class="submit-btn">
+                    <span data-localize="submit_button">માહિતી સબમિટ કરો</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
         </div>
     </form>
 </div>
+
+<!-- Confirmation Modal Overlay -->
+<div id="confirm-modal-overlay" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-title-area">
+                <h2 class="modal-title" data-localize="modal_title">માહિતીની ચકાસણી કરો (Review Details)</h2>
+                <p class="modal-subtitle" data-localize="modal_subtitle">કૃપા કરીને સબમિટ કરતા પહેલા તમારી વિગતો ચકાસો.</p>
+            </div>
+            <button type="button" class="modal-close-btn" id="modal-close-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="modal-body" id="modal-summary-body">
+            <!-- Summary will be dynamically rendered here -->
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-cancel" id="modal-cancel-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <span data-localize="modal_btn_edit">સુધારો કરો (Edit)</span>
+            </button>
+            <button type="button" class="modal-btn modal-btn-submit" id="modal-submit-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                <span data-localize="modal_btn_confirm">સબમિટ કરો (Confirm Submit)</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container"></div>
+
+
 
 <script>
     // Theme Engine Setup
@@ -1382,43 +1879,61 @@
     const modeButtons = document.querySelectorAll('#mode-switcher button');
     let currentMode = localStorage.getItem('user-mode') || 'house';
 
-    function setMode(mode) {
+    function setMode(mode, triggerSearch = true) {
         currentMode = mode;
         localStorage.setItem('user-mode', mode);
+        
+        // Sync the hidden mode input
+        const modeInput = document.getElementById('form-mode');
+        if (modeInput) {
+            modeInput.value = mode;
+        }
+
         modeButtons.forEach(btn => {
             btn.classList.remove('active');
             if (btn.getAttribute('data-mode') === mode) {
                 btn.classList.add('active');
             }
         });
+        
+        if (!triggerSearch && typeof lastSearchedMode !== 'undefined') {
+            lastSearchedMode = mode;
+        }
+
         // At this moment all fields remain displayed as requested.
+        if (triggerSearch && typeof checkHouseRecord === 'function') {
+            checkHouseRecord();
+        }
     }
 
     modeButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            setMode(btn.getAttribute('data-mode'));
+            setMode(btn.getAttribute('data-mode'), true);
         });
     });
 
-    setMode(currentMode);
+    // setMode call is moved to the bottom of the script to prevent hoisting Temporal Dead Zone issues
 
     // Multilingual Localization System
     const localization = {
         gu: {
             portal_title: "વસ્તી ગણતરી પોર્ટલ",
+            loader_title: "માહિતી ચકાસી રહ્યા છીએ...",
+            loader_subtitle: "કૃપા કરીને થોડી રાહ જુઓ, ડેટા લોડ થઈ રહ્યો છે.",
             form_title: "વસ્તી ગણતરી માટેના ૩૪ પ્રશ્નોની યાદી",
             form_desc: "રાષ્ટ્રીય જનગણના પત્રક પૂર્ણ કરવા માટે નીચે આપેલ તમામ ૩૪ પ્રશ્નોના જવાબો ચોકસાઈપૂર્વક ભરો.",
             completion_progress: "ફોર્મ ભરવાની પ્રગતિ",
-            sec_1_title: "વહીવટી વિગતો (Administrative Details)",
-            sec_2_title: "મકાન અને સુવિધાઓની વિગતો (Housing & Facilities)",
-            sec_3_title: "કુટુંબના સભ્યો અને વસ્તી વિષયક (Demographics)",
-            sec_4_title: "ઘરગથ્થુ અસ્કયામતો અને કનેક્ટિવિટી (Assets & Connectivity)",
+            sec_1_title: "ભાગ ૧: પ્રશ્નો ૧ - ૯ (Part 1: Questions 1 - 9)",
+            sec_2_title: "ભાગ ૨: પ્રશ્નો ૧૦ - ૧૮ (Part 2: Questions 10 - 18)",
+            sec_3_title: "ભાગ ૩: પ્રશ્નો ૧૯ - ૨૬ (Part 3: Questions 19 - 26)",
+            sec_4_title: "ભાગ ૪: પ્રશ્નો ૨૭ - ૩૪ (Part 4: Questions 27 - 34)",
             
             yes: "હા",
             no: "ના",
             other: "અન્ય",
             submit_button: "માહિતી સબમિટ કરો",
             submit_success: "વસ્તી ગણતરી ફોર્મ સફળતાપૂર્વક સબમિટ કરવામાં આવ્યું છે!",
+            nav_download_data: "ડેટા ડાઉનલોડ",
 
             mode_house: "મકાન (House)",
             mode_shop: "દુકાન (Shop)",
@@ -1543,23 +2058,43 @@
             q33_opt_1: "ઘઉં",
             q33_opt_2: "બાજરી",
 
-            q34_label: "મો.નં:"
+            q34_label: "મો.નં:",
+            error_required: "આ પ્રશ્નનો જવાબ આપવો ફરજિયાત છે.",
+            error_choice: "કૃપા કરીને આપેલ વિકલ્પોમાંથી કોઈ એક પસંદ કરો.",
+            error_number: "કૃપા કરીને સાચી સંખ્યા દાખલ કરો.",
+            error_positive: "કૃપા કરીને શૂન્ય કરતાં મોટી સંખ્યા દાખલ કરો.",
+            error_non_negative: "કૃપા કરીને શૂન્ય અથવા ધન પૂર્ણાંક દાખલ કરો.",
+            error_couples: "પરિણીત યુગલોની સંખ્યા કુલ સભ્યોની સંખ્યાથી વધુ ન હોઈ શકે.",
+            error_mobile: "કૃપા કરીને સાચો ૧૦-અંકનો ભારતીય મોબાઇલ નંબર દાખલ કરો.",
+            error_name: "કૃપા કરીને સાચું નામ દાખલ કરો (ફક્ત અક્ષરો).",
+            modal_title: "માહિતીની ચકાસણી કરો",
+            modal_subtitle: "કૃપા કરીને સબમિટ કરતા પહેલા તમારી વિગતો ચકાસો.",
+            modal_btn_edit: "સુધારો કરો",
+            modal_btn_confirm: "સબમિટ કરો",
+            toast_success_title: "સફળતા",
+            toast_success_msg: "વસ્તી ગણતરી ફોર્મ સફળતાપૂર્વક સબમિટ કરવામાં આવ્યું છે!",
+            toast_error_title: "ભૂલ",
+            toast_error_msg: "સબમિશનમાં ભૂલ આવી છે. કૃપા કરીને ફરી પ્રયાસ કરો.",
+            empty_field_msg: "ભરેલ નથી"
         },
         hi: {
             portal_title: "जनगणना पोर्टल",
+            loader_title: "विवरण की जांच कर रहे हैं...",
+            loader_subtitle: "कृपया कुछ प्रतीक्षा करें, डेटा खोजा जा रहा है...",
             form_title: "जनगणना के लिए ३४ प्रश्नों की सूची",
             form_desc: "राष्ट्रीय जनगणना प्रपत्र को पूरा करने के लिए नीचे दिए गए सभी ३४ प्रश्नों के उत्तर ध्यानपूर्वक भरें।",
             completion_progress: "फॉर्म भरने की प्रगति",
-            sec_1_title: "प्रशासनिक विवरण (Administrative Details)",
-            sec_2_title: "आवास और सुविधाएं (Housing & Facilities)",
-            sec_3_title: "परिवार के सदस्य और जनसांख्यिकी (Demographics)",
-            sec_4_title: "घरेलू संपत्ति और कनेक्टिविटी (Assets & Connectivity)",
+            sec_1_title: "भाग १: प्रश्न १ - ९ (Part 1: Questions 1 - 9)",
+            sec_2_title: "भाग २: प्रश्न १० - १८ (Part 2: Questions 10 - 18)",
+            sec_3_title: "भाग ३: प्रश्न १९ - २६ (Part 3: Questions 19 - 26)",
+            sec_4_title: "भाग ४: प्रश्न २७ - ३४ (Part 4: Questions 27 - 34)",
             
             yes: "हाँ",
             no: "नहीं",
             other: "अन्य",
             submit_button: "डेटा जमा करें",
             submit_success: "जनगणना फॉर्म सफलतापूर्वक जमा कर दिया गया है!",
+            nav_download_data: "डेटा डाउनलोड",
 
             mode_house: "मकान (House)",
             mode_shop: "दुकान (Shop)",
@@ -1684,23 +2219,43 @@
             q33_opt_1: "गेहूँ",
             q33_opt_2: "बाजरा",
 
-            q34_label: "मोबाइल नंबर:"
+            q34_label: "मोबाइल नंबर:",
+            error_required: "यह फ़ील्ड आवश्यक है।",
+            error_choice: "कृपया एक विकल्प चुनें।",
+            error_number: "कृपया एक मान्य संख्या दर्ज करें।",
+            error_positive: "कृपया शून्य से बड़ी संख्या दर्ज करें।",
+            error_non_negative: "कृपया शून्य या धनात्मक पूर्णांक दर्ज करें।",
+            error_couples: "विवाहित जोड़ों की संख्या कुल सदस्यों से अधिक नहीं हो सकती।",
+            error_mobile: "कृपया एक मान्य 10-अंकीय भारतीय मोबाइल नंबर दर्ज करें।",
+            error_name: "कृपया एक मान्य नाम दर्ज करें (केवल अक्षर)।",
+            modal_title: "विवरण की समीक्षा करें",
+            modal_subtitle: "कृपया सबमिट करने से पहले अपने विवरण सत्यापित करें।",
+            modal_btn_edit: "संपादित करें",
+            modal_btn_confirm: "पुष्टि करें और सबमिट करें",
+            toast_success_title: "सफलता",
+            toast_success_msg: "जनगणना फॉर्म सफलतापूर्वक जमा कर दिया गया है!",
+            toast_error_title: "त्रुटि",
+            toast_error_msg: "सबमिशन में त्रुटि आई। कृपया पुनः प्रयास करें।",
+            empty_field_msg: "नहीं भरा गया"
         },
         en: {
             portal_title: "Census Portal",
+            loader_title: "Checking Details...",
+            loader_subtitle: "Please wait, searching existing database records...",
             form_title: "Census List of 34 Questions",
             form_desc: "Please accurately fill out all 34 questions below to complete the national census registration form.",
             completion_progress: "Form Progress",
-            sec_1_title: "Administrative Details",
-            sec_2_title: "Housing & Facilities",
-            sec_3_title: "Demographics",
-            sec_4_title: "Assets & Connectivity",
+            sec_1_title: "Part 1: Questions 1 - 9",
+            sec_2_title: "Part 2: Questions 10 - 18",
+            sec_3_title: "Part 3: Questions 19 - 26",
+            sec_4_title: "Part 4: Questions 27 - 34",
             
             yes: "Yes",
             no: "No",
             other: "Other",
             submit_button: "Submit Information",
             submit_success: "Census form submitted successfully!",
+            nav_download_data: "Download Data",
 
             mode_house: "House",
             mode_shop: "Shop",
@@ -1825,7 +2380,24 @@
             q33_opt_1: "Wheat",
             q33_opt_2: "Millet",
 
-            q34_label: "Mobile Number:"
+            q34_label: "Mobile Number:",
+            error_required: "This field is required.",
+            error_choice: "Please select an option.",
+            error_number: "Please enter a valid number.",
+            error_positive: "Please enter a positive integer.",
+            error_non_negative: "Please enter a non-negative integer.",
+            error_couples: "Married couples cannot exceed total family members.",
+            error_mobile: "Please enter a valid 10-digit Indian mobile number.",
+            error_name: "Please enter a valid name (letters only).",
+            modal_title: "Review Your Details",
+            modal_subtitle: "Please verify your filled details before submitting.",
+            modal_btn_edit: "Cancel & Edit",
+            modal_btn_confirm: "Confirm & Submit",
+            toast_success_title: "Success",
+            toast_success_msg: "Census form submitted successfully!",
+            toast_error_title: "Error",
+            toast_error_msg: "Submission failed. Please try again.",
+            empty_field_msg: "Not Filled"
         }
     };
 
@@ -1854,6 +2426,12 @@
                 el.textContent = localization[lang][key];
             }
         });
+
+        // Sync download data link language
+        const downloadBtn = document.getElementById('nav-download-btn');
+        if (downloadBtn) {
+            downloadBtn.href = `/download-data?lang=${lang}`;
+        }
 
         // Update placeholder texts dynamically
         const placeholderMapping = {
@@ -2109,10 +2687,278 @@
         runFieldValidation(this);
     });
 
+    // Restrict mobile number input to digits only and maximum 10 digits
+    $('#q34').on('keypress', function(e) {
+        if (e.which < 48 || e.which > 57) {
+            e.preventDefault();
+        }
+    }).on('input', function() {
+        let val = this.value.replace(/\D/g, '');
+        if (val.length > 10) {
+            val = val.substring(0, 10);
+        }
+        this.value = val;
+    });
 
 
-    // Form submit interceptor
+
+    // Form submit interceptor with Confirmation Modal and AJAX submission
     const form = document.getElementById('census-form');
+    
+    // modal elements
+    const modalOverlay = document.getElementById('confirm-modal-overlay');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalSubmitBtn = document.getElementById('modal-submit-btn');
+    const modalSummaryBody = document.getElementById('modal-summary-body');
+
+    // Show toast function
+    function showToast(title, message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast-card ${type}`;
+
+        // Pick appropriate SVG icon
+        let iconSvg = '';
+        if (type === 'success') {
+            iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        } else if (type === 'error') {
+            iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+        } else {
+            iconSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="9" x2="12.01" y2="9"></line></svg>`;
+        }
+
+        toast.innerHTML = `
+            <div class="toast-icon">${iconSvg}</div>
+            <div class="toast-content">
+                <span class="toast-title">${title}</span>
+                <span class="toast-message">${message}</span>
+            </div>
+            <button class="toast-close-btn" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div class="toast-progress"></div>
+        `;
+
+        container.appendChild(toast);
+
+        // Trigger slide-in animation
+        setTimeout(() => toast.classList.add('show'), 10);
+
+        const duration = 4000;
+        const progress = toast.querySelector('.toast-progress');
+        if (progress) {
+            progress.style.transition = `transform ${duration}ms linear`;
+            progress.style.transform = 'scaleX(0)';
+        }
+
+        const closeToast = () => {
+            toast.classList.remove('show');
+            toast.classList.add('hide');
+            setTimeout(() => toast.remove(), 400);
+        };
+
+        const timerId = setTimeout(closeToast, duration);
+
+        toast.querySelector('.toast-close-btn').addEventListener('click', () => {
+            clearTimeout(timerId);
+            closeToast();
+        });
+    }
+
+    // Modal open function
+    function openConfirmModal() {
+        renderModalSummary();
+        modalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Modal close function
+    function closeConfirmModal() {
+        modalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        // restore submit button state
+        const submitBtnText = modalSubmitBtn.querySelector('span');
+        if (submitBtnText) {
+            submitBtnText.textContent = localization[currentLang].modal_btn_confirm;
+        }
+        const spinner = modalSubmitBtn.querySelector('.spinner');
+        if (spinner) spinner.remove();
+        modalSubmitBtn.removeAttribute('disabled');
+    }
+
+    // Render summary data in modal in a single form sequence (no sections)
+    function renderModalSummary() {
+        modalSummaryBody.innerHTML = '';
+
+        // Gather filled details dynamically
+        const summaryData = [];
+        $('.form-group').each(function() {
+            const $group = $(this);
+            const qNumEl = $group.find('.question-number');
+            if (!qNumEl.length) return;
+            const qNum = parseInt(qNumEl.text().trim(), 10);
+            if (isNaN(qNum)) return;
+
+            const labelEl = $group.find('.form-label').clone();
+            labelEl.find('.question-number').remove();
+            const qLabelText = labelEl.text().replace(/:$/, '').trim();
+
+            let valueText = '';
+            const radios = $group.find('input[type="radio"]');
+            const checkboxes = $group.find('input[type="checkbox"]');
+            const textInputs = $group.find('input[type="text"], input[type="number"], input[type="tel"]');
+
+            if (radios.length > 0) {
+                const checkedRadio = radios.filter(':checked');
+                if (checkedRadio.length) {
+                    valueText = checkedRadio.closest('.choice-card').find('.choice-pill').text().trim();
+                } else {
+                    valueText = '—';
+                }
+            } else if (checkboxes.length > 0) {
+                const checkedCheckboxes = checkboxes.filter(':checked');
+                if (checkedCheckboxes.length) {
+                    const vals = [];
+                    checkedCheckboxes.each(function() {
+                        vals.push($(this).closest('.choice-card').find('.choice-pill').text().trim());
+                    });
+                    valueText = vals.join(', ');
+                } else {
+                    valueText = '—';
+                }
+            } else if (textInputs.length > 0) {
+                const val = textInputs.val().trim();
+                valueText = val !== '' ? val : '—';
+            }
+
+            summaryData.push({
+                num: qNum,
+                label: qLabelText,
+                value: valueText,
+                isFilled: valueText !== '—'
+            });
+        });
+
+        // Sort by question number to ensure exact form sequence
+        summaryData.sort((a, b) => a.num - b.num);
+
+        const grid = document.createElement('div');
+        grid.className = 'summary-grid';
+
+        summaryData.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = `summary-item ${!item.isFilled ? 'summary-item-empty' : ''}`;
+            
+            const displayVal = item.isFilled ? item.value : (localization[currentLang].empty_field_msg || 'Not Filled');
+            itemDiv.innerHTML = `
+                <div class="summary-item-label">
+                    <span class="question-number" style="min-width:16px;height:16px;font-size:0.7rem;padding:0;">${item.num}</span>
+                    <span>${item.label}</span>
+                </div>
+                <div class="summary-item-value">${displayVal}</div>
+            `;
+            grid.appendChild(itemDiv);
+        });
+
+        modalSummaryBody.appendChild(grid);
+    }
+
+    // Modal Action Bindings
+    modalCloseBtn.addEventListener('click', closeConfirmModal);
+    modalCancelBtn.addEventListener('click', closeConfirmModal);
+
+    modalSubmitBtn.addEventListener('click', () => {
+        // Show loading state
+        modalSubmitBtn.setAttribute('disabled', 'true');
+        const submitBtnText = modalSubmitBtn.querySelector('span');
+        if (submitBtnText) {
+            submitBtnText.textContent = currentLang === 'en' ? 'Submitting...' : (currentLang === 'hi' ? 'जमा कर रहे हैं...' : 'મોકલી રહ્યું છે...');
+        }
+        const spinner = document.createElement('span');
+        spinner.className = 'spinner';
+        modalSubmitBtn.prepend(spinner);
+
+        // Check if updating an existing record
+        const recordId = document.getElementById('record-id').value;
+        const formData = new FormData(form);
+        
+        let url = '/census';
+        if (recordId) {
+            url = `/census/${recordId}`;
+            formData.append('_method', 'PUT');
+        }
+
+        const doSubmit = (retryCount = 0) => {
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    closeConfirmModal();
+                    showToast(
+                        localization[currentLang].toast_success_title || 'Success',
+                        recordId 
+                            ? (currentLang === 'en' ? 'Census record updated successfully!' : (currentLang === 'hi' ? 'जनगणना विवरण सफलतापूर्वक अपडेट किया गया!' : 'વસ્તી ગણતરી વિગતો સફળતાપૂર્વક અપડેટ થઈ ગઈ છે!'))
+                            : (localization[currentLang].toast_success_msg || 'Census form submitted successfully!'),
+                        'success'
+                    );
+                    // Reset form and recalculate completion progress
+                    form.reset();
+                    document.getElementById('record-id').value = '';
+                    document.getElementById('form-mode').value = currentMode;
+                    if (typeof lastSearchedHouseNo !== 'undefined') {
+                        lastSearchedHouseNo = '';
+                        lastSearchedMode = currentMode;
+                    }
+                    calculateProgress();
+                    // Scroll page back to top smoothly
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (response.status === 419 && retryCount < 1) {
+                    // CSRF Token Expired - fetch a new one in the background and retry
+                    console.warn('CSRF token expired. Fetching fresh token and retrying...');
+                    return fetch('/refresh-csrf')
+                        .then(res => {
+                            if (!res.ok) throw new Error('Failed to refresh CSRF token');
+                            return res.json();
+                        })
+                        .then(data => {
+                            const newToken = data.token;
+                            // Update token in DOM inputs and their defaults to survive resets
+                            document.querySelectorAll('input[name="_token"]').forEach(input => {
+                                input.value = newToken;
+                                input.defaultValue = newToken;
+                            });
+                            // Update token in FormData object
+                            formData.set('_token', newToken);
+                            // Retry submission
+                            doSubmit(retryCount + 1);
+                        });
+                } else {
+                    throw new Error('Server returned error status: ' + response.status);
+                }
+            })
+            .catch(error => {
+                console.error('Submission error:', error);
+                closeConfirmModal();
+                showToast(
+                    localization[currentLang].toast_error_title || 'Error',
+                    localization[currentLang].toast_error_msg || 'Submission failed. Please try again.',
+                    'error'
+                );
+            });
+        };
+
+        doSubmit();
+    });
+
+    // Form submit listener
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         
@@ -2138,7 +2984,7 @@
         });
 
         if (isFormValid) {
-            alert(localization[currentLang].submit_success || 'Submitted successfully!');
+            openConfirmModal();
         } else if (firstInvalidElement) {
             // Scroll to the first error smoothly
             const group = firstInvalidElement.closest('.form-group');
@@ -2151,6 +2997,206 @@
             }
         }
     });
+
+    let lastSearchedHouseNo = '';
+    let lastSearchedMode = '';
+
+    // Sync function: searches database by house_no and mode, then populates or resets form
+    function checkHouseRecord() {
+        const houseNo = $('#q2').val().trim();
+        const mode = currentMode;
+        const $recordIdInput = $('#record-id');
+
+        if (!houseNo) {
+            lastSearchedHouseNo = '';
+            lastSearchedMode = mode;
+            clearFormExceptHouseNo();
+            $recordIdInput.val('');
+            return;
+        }
+
+        // Don't repeat query if the house number and mode haven't changed
+        if (houseNo === lastSearchedHouseNo && mode === lastSearchedMode) {
+            return;
+        }
+
+        lastSearchedHouseNo = houseNo;
+        lastSearchedMode = mode;
+
+        // Show spinner loader
+        $('#house-loader').show();
+
+        // Perform AJAX GET request
+        $.ajax({
+            url: '/census/check-house',
+            method: 'GET',
+            data: {
+                house_no: houseNo,
+                mode: mode
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success && response.found) {
+                    const record = response.data;
+                    $recordIdInput.val(record.id);
+
+                    // Sync active mode dynamically if the record's mode in database is different
+                    if (record.mode && record.mode !== currentMode) {
+                        setMode(record.mode, false);
+                    }
+
+                    // Populate form fields with response data
+                    populateForm(record);
+
+                    // Recalculate progress bar
+                    calculateProgress();
+
+                    // Show custom message toast
+                    showToast(
+                        currentLang === 'en' ? 'Record Loaded' : (currentLang === 'hi' ? 'विवरण लोड किए गए' : 'માહિતી લોડ થઈ'),
+                        currentLang === 'en' ? `Loaded existing details for House Number: ${houseNo}` : (currentLang === 'hi' ? `मकान संख्या: ${houseNo} के लिए मौजूदा विवरण लोड किया गया` : `મકાન નંબર: ${houseNo} માટેની વિગતો લોડ કરવામાં આવી છે`),
+                        'info'
+                    );
+                } else {
+                    // Not found in database
+                    // If a record was previously loaded (recordId is set), we need to clear the form fields
+                    if ($recordIdInput.val()) {
+                        clearFormExceptHouseNo();
+                        $recordIdInput.val('');
+                        calculateProgress();
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('House search error:', error);
+            },
+            complete: function() {
+                // Hide spinner loader when request completes
+                $('#house-loader').hide();
+            }
+        });
+    }
+
+    // Helper to populate all form fields with record data
+    function populateForm(record) {
+        // Text & Number inputs mappings
+        const textInputs = {
+            'q1': record.lineNo,
+            'q3': record.censusHouseNo,
+            'q9': record.householdNo,
+            'q10': record.totalMembers,
+            'q11': record.headName,
+            'q15': record.dwellingRooms,
+            'q16': record.marriedCouples,
+            'q21': record.latrineType,
+            'q34': record.mobileNo
+        };
+
+        for (const [id, value] of Object.entries(textInputs)) {
+            const input = document.getElementById(id);
+            if (input) {
+                input.value = value !== null && value !== undefined ? value : '';
+                // Clear any validation errors on populated fields
+                clearFieldStyle(input);
+            }
+        }
+
+        // Radio button mappings
+        const radios = {
+            'floor_material': record.floorMaterial,
+            'wall_material': record.wallMaterial,
+            'roof_material': record.roofMaterial,
+            'house_use': record.houseUse,
+            'house_condition': record.houseCondition,
+            'head_gender': record.headGender,
+            'social_category': record.socialCategory,
+            'ownership': record.ownership,
+            'drinking_water': record.drinkingWater,
+            'water_availability': record.waterAvailability,
+            'lighting_source': record.lightingSource,
+            'latrine_facility': record.latrineFacility,
+            'drainage_system': record.drainageSystem,
+            'bathroom_facility': record.bathroomFacility,
+            'kitchen_facility': record.kitchenFacility,
+            'cooking_fuel': record.cookingFuel,
+            'has_radio': record.hasRadio,
+            'has_tv': record.hasTv,
+            'has_internet': record.hasInternet,
+            'has_pc': record.hasPc,
+            'phone_type': record.phoneType,
+            'has_car': record.hasCar,
+            'main_cereal': record.mainCereal
+        };
+
+        for (const [name, value] of Object.entries(radios)) {
+            if (value !== null && value !== undefined) {
+                const radioInput = document.querySelector(`input[name="${name}"][value="${value}"]`);
+                if (radioInput) {
+                    radioInput.checked = true;
+                    clearFieldStyle(radioInput);
+                } else {
+                    document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = false);
+                }
+            } else {
+                document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.checked = false);
+            }
+        }
+
+        // Checkbox mapping: vehicles
+        const vehicles = record.vehicles || [];
+        const checkboxes = document.querySelectorAll('input[name="vehicles[]"]');
+        checkboxes.forEach(cb => {
+            cb.checked = vehicles.includes(cb.value);
+            clearFieldStyle(cb);
+        });
+    }
+
+    // Helper to reset form except house_no input
+    function clearFormExceptHouseNo() {
+        const houseNo = $('#q2').val();
+        
+        // Temporarily reset but preserve house_no
+        form.reset();
+        
+        // Re-set preserved house_no
+        $('#q2').val(houseNo);
+        
+        // Restore active form mode to prevent it from resetting to "house"
+        const modeInput = document.getElementById('form-mode');
+        if (modeInput) {
+            modeInput.value = currentMode;
+        }
+
+        // Also clear any styling errors across all elements
+        trackingInputs.forEach(input => {
+            clearFieldStyle(input);
+        });
+
+        // Recalculate progress bar
+        calculateProgress();
+    }
+
+    // Listen to changes on house number input with debounce on input typing
+    let searchTimeout = null;
+    $('#q2').on('input change blur keydown', function(e) {
+        if (e.type === 'keydown' && e.key !== 'Enter') {
+            return;
+        }
+        if (e.type === 'keydown') {
+            e.preventDefault(); // Prevents submitting form if enter is pressed
+        }
+        
+        clearTimeout(searchTimeout);
+        
+        if (e.type === 'input') {
+            searchTimeout = setTimeout(checkHouseRecord, 600); // 600ms debounce
+        } else {
+            checkHouseRecord();
+        }
+    });
+
+    // Set initial mode on startup after all references are initialized
+    setMode(currentMode, false);
 </script>
 </body>
 </html>

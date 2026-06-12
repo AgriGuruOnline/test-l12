@@ -11,7 +11,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+            \App\Repositories\Contracts\CensusRecordRepositoryInterface::class,
+            \App\Repositories\Eloquent\EloquentCensusRecordRepository::class
+        );
     }
 
     /**
@@ -19,6 +22,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if (
+            str_starts_with(request()->header('X-Forwarded-Proto', ''), 'https') || 
+            request()->secure() || 
+            str_contains(request()->header('Host', ''), 'devtunnels.ms')
+        ) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }

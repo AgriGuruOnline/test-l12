@@ -29,58 +29,57 @@ class CensusRecordStoreRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isHouse = $this->input('mode') === 'house';
+
         return [
             // Mode and House No are strictly required to define the entry
             'mode' => 'required|string|in:house,shop',
             'house_no' => 'required|string|max:50',
             
-            // All other questions are set to nullable to support drafts or partial forms
-            'line_no' => 'nullable|integer|min:1',
-            'census_house_no' => 'nullable|string|max:50',
-            'floor_material' => 'nullable|string|in:mud,wood,stone,cement,tiles',
-            'wall_material' => 'nullable|string|in:grass_bamboo,plastic,mud,wood,stone,burnt_brick,concrete',
-            'roof_material' => 'nullable|string|in:grass,tiles,metal,stone,slate,concrete',
-            'house_use' => 'nullable|string|in:residential,residential_shop,school,other',
-            'house_condition' => 'nullable|string|in:good,livable,dilapidated',
-            'household_no' => 'nullable|integer|min:1',
-            'total_members' => 'nullable|integer|min:1',
+            'line_no' => ($isHouse ? 'required' : 'nullable') . '|integer|min:1',
+            'census_house_no' => ($isHouse ? 'required' : 'nullable') . '|string|max:50',
+            'floor_material' => ($isHouse ? 'required' : 'nullable') . '|string|in:mud,wood,stone,cement,tiles',
+            'wall_material' => ($isHouse ? 'required' : 'nullable') . '|string|in:grass_bamboo,plastic,mud,wood,stone,burnt_brick,concrete',
+            'roof_material' => ($isHouse ? 'required' : 'nullable') . '|string|in:grass,tiles,metal,stone,slate,concrete',
+            'house_use' => ($isHouse ? 'required' : 'nullable') . '|string|in:residential,residential_shop,school,other',
+            'house_condition' => ($isHouse ? 'required' : 'nullable') . '|string|in:good,livable,dilapidated', // wait, is liveable or livable? In model/factory it was 'livable', let's check
+            'household_no' => ($isHouse ? 'required' : 'nullable') . '|integer|min:1',
+            'total_members' => ($isHouse ? 'required' : 'nullable') . '|integer|min:1',
             
-            // Matches English, Hindi, and Gujarati alphabetic characters and spaces
             'head_name' => [
-                'nullable',
+                $isHouse ? 'required' : 'nullable',
                 'string',
                 'min:2',
                 'max:255',
                 'regex:/^[a-zA-Z\s\x{0A80}-\x{0AFF}\x{0900}-\x{097F}]+$/u'
             ],
-            'head_gender' => 'nullable|string|in:male,female,trans',
-            'social_category' => 'nullable|string|in:sc,st,other',
-            'ownership' => 'nullable|string|in:owned,rented_other,rented_none,other',
-            'dwelling_rooms' => 'nullable|integer|min:1',
-            'married_couples' => 'nullable|integer|min:0|lte:total_members',
-            'drinking_water' => 'nullable|string|in:tap_treated,tap_untreated,handpump,borewell,river_pond,bottled',
-            'water_availability' => 'nullable|string|in:premises,near,away',
-            'lighting_source' => 'nullable|string|in:electricity,kerosene,solar',
-            'latrine_facility' => 'nullable|string|in:private,shared,open',
-            'latrine_type' => 'nullable|string|max:100',
-            'drainage_system' => 'nullable|string|in:sewer,septic,pit,closed_drain,open_drain,none',
-            'bathroom_facility' => 'nullable|string|in:yes,no',
-            'kitchen_facility' => 'nullable|string|in:yes,no',
-            'cooking_fuel' => 'nullable|string|in:firewood,cowdung,lpg_png,solar',
-            'has_radio' => 'nullable|string|in:yes,no',
-            'has_tv' => 'nullable|string|in:yes,no',
-            'has_internet' => 'nullable|string|in:yes,no',
-            'has_pc' => 'nullable|string|in:yes,no',
-            'phone_type' => 'nullable|string|in:smartphone,featurephone,both',
+            'head_gender' => ($isHouse ? 'required' : 'nullable') . '|string|in:male,female,trans',
+            'social_category' => ($isHouse ? 'required' : 'nullable') . '|string|in:sc,st,other',
+            'ownership' => ($isHouse ? 'required' : 'nullable') . '|string|in:owned,rented_other,rented_none,other',
+            'dwelling_rooms' => ($isHouse ? 'required' : 'nullable') . '|integer|min:1',
+            'married_couples' => ($isHouse ? 'required' : 'nullable') . '|integer|min:0|lte:total_members',
+            'drinking_water' => ($isHouse ? 'required' : 'nullable') . '|string|in:tap_treated,tap_untreated,handpump,borewell,river_pond,bottled',
+            'water_availability' => ($isHouse ? 'required' : 'nullable') . '|string|in:premises,near,away',
+            'lighting_source' => ($isHouse ? 'required' : 'nullable') . '|string|in:electricity,kerosene,solar',
+            'latrine_facility' => ($isHouse ? 'required' : 'nullable') . '|string|in:private,shared,open',
+            'latrine_type' => ($isHouse ? 'required_if:latrine_facility,private,shared' : 'nullable') . '|nullable|string|max:100',
+            'drainage_system' => ($isHouse ? 'required' : 'nullable') . '|string|in:sewer,septic,pit,closed_drain,open_drain,none',
+            'bathroom_facility' => ($isHouse ? 'required' : 'nullable') . '|string|in:yes,no',
+            'kitchen_facility' => ($isHouse ? 'required' : 'nullable') . '|string|in:yes,no',
+            'cooking_fuel' => ($isHouse ? 'required' : 'nullable') . '|string|in:firewood,cowdung,lpg_png,solar',
+            'has_radio' => ($isHouse ? 'required' : 'nullable') . '|string|in:yes,no',
+            'has_tv' => ($isHouse ? 'required' : 'nullable') . '|string|in:yes,no',
+            'has_internet' => ($isHouse ? 'required' : 'nullable') . '|string|in:yes,no',
+            'has_pc' => ($isHouse ? 'required' : 'nullable') . '|string|in:yes,no',
+            'phone_type' => ($isHouse ? 'required' : 'nullable') . '|string|in:smartphone,featurephone,both',
             
             'vehicles' => 'nullable|array',
             'vehicles.*' => 'string|in:bicycle,motorcycle',
             
-            'has_car' => 'nullable|string|in:yes,no',
-            'main_cereal' => 'nullable|string|in:wheat,millet',
+            'has_car' => ($isHouse ? 'required' : 'nullable') . '|string|in:yes,no',
+            'main_cereal' => ($isHouse ? 'required' : 'nullable') . '|string|in:wheat,millet',
             
-            // 10-digit Indian Mobile Number starting with 6-9
-            'mobile_no' => 'nullable|string|regex:/^[6-9]\d{9}$/',
+            'mobile_no' => ($isHouse ? 'required' : 'nullable') . '|string|regex:/^[6-9]\d{9}$/',
         ];
     }
 

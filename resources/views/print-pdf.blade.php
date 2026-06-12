@@ -132,33 +132,40 @@
             content: "Page " counter(page);
         }
 
-        /* Hide Print controls on print media */
+        /* Print action controls top bar (hidden in print mode) */
         .print-controls {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid #ccc;
-            padding: 8px 12px;
-            border-radius: 6px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 9999;
+            background-color: #f8fafc;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 12px 24px;
             display: flex;
-            gap: 8px;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 15px;
+            width: 100%;
         }
 
         .btn-print-action {
-            background: #2437F4;
+            background-color: #2437F4;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 8px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: bold;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
+        }
+        .btn-print-action:hover {
+            background-color: #1a25c2;
         }
         .btn-print-action.cancel {
-            background: #666;
+            background-color: #64748b;
+        }
+        .btn-print-action.cancel:hover {
+            background-color: #475569;
         }
 
         @media print {

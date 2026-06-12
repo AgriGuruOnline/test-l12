@@ -145,6 +145,8 @@
 
         /* Top Bar with Language Switcher & Theme toggle */
         .top-bar {
+            position: relative;
+            z-index: 200;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -999,6 +1001,219 @@
             .modal-body {
                 padding: 1.25rem;
             }
+            .profile-widget {
+                position: relative !important;
+            }
+            .profile-menu {
+                left: auto !important;
+                right: 0 !important;
+                width: 250px !important;
+                top: 48px !important;
+                margin-top: 8px !important;
+                transform-origin: top right !important;
+            }
+            /* Hide settings in header on mobile */
+            .top-bar .switcher {
+                display: none !important;
+            }
+            /* Show settings in profile dropdown on mobile */
+            .profile-settings-section {
+                display: flex !important;
+                flex-direction: column !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .top-bar {
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 0.75rem 1rem !important;
+            }
+            .bar-left {
+                width: auto !important;
+            }
+            .bar-right {
+                flex-direction: row !important;
+                width: auto !important;
+                gap: 0.5rem !important;
+            }
+        }
+
+        /* Header Profile Widget */
+        .profile-widget {
+            position: relative;
+            z-index: 100;
+            font-family: inherit;
+        }
+        .profile-trigger {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .profile-trigger:hover {
+            transform: scale(1.05);
+            background-color: #4338ca;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.5);
+        }
+        .profile-menu {
+            position: absolute;
+            top: 48px;
+            right: 0;
+            width: 260px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), var(--card-shadow);
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            transform-origin: top right;
+            animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .profile-menu.show {
+            display: flex;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .profile-info {
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px;
+            text-align: left;
+        }
+        .profile-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-title);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profile-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profile-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: var(--text-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            text-align: left;
+        }
+        .profile-link:hover {
+            background-color: var(--toggle-bg);
+            color: var(--text-title);
+        }
+        .btn-logout-danger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            background-color: #e11d48;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2);
+        }
+        .btn-logout-danger:hover {
+            background-color: #be123c;
+            box-shadow: 0 6px 16px rgba(225, 29, 72, 0.4);
+        }
+        .profile-settings-section {
+            display: none; /* Hidden by default (on desktop) */
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .profile-settings-section .switcher-group,
+        .profile-settings-section .switcher {
+            display: flex !important;
+            flex-direction: row !important;
+            width: 100% !important;
+            background: var(--toggle-bg) !important;
+            border: 1px solid var(--toggle-border) !important;
+            padding: 4px !important;
+            border-radius: 12px !important;
+            gap: 2px !important;
+        }
+        .profile-settings-section .switch-btn,
+        .profile-settings-section .switcher button {
+            flex: 1 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 6px 8px !important;
+            border-radius: 8px !important;
+            font-size: 0.75rem !important;
+            cursor: pointer !important;
+            color: var(--text-body) !important;
+            transition: var(--transition) !important;
+            box-sizing: border-box !important;
+        }
+        .profile-settings-section .switch-btn.active,
+        .profile-settings-section .switcher button.active {
+            background: var(--toggle-active-bg) !important;
+            color: var(--text-title) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+            border: none !important;
+        }
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+        }
+        .setting-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -1014,6 +1229,8 @@
                 <span class="logo-text" id="txt-portal">વસ્તી ગણતરી રજિસ્ટર</span>
             </div>
             <div class="bar-right">
+
+
                 <!-- Theme Controller -->
                 <div class="switcher" id="theme-switcher">
                     <button data-theme-val="light" id="btn-theme-light">Light</button>
@@ -1025,6 +1242,46 @@
                     <button data-lang="gu" class="{{ $currentLang === 'gu' ? 'active' : '' }}">ગુજરાતી</button>
                     <button data-lang="hi" class="{{ $currentLang === 'hi' ? 'active' : '' }}">हिन्दी</button>
                     <button data-lang="en" class="{{ $currentLang === 'en' ? 'active' : '' }}">English</button>
+                </div>
+
+                <!-- Profile Widget -->
+                <div class="profile-widget" id="profile-widget">
+                    <button type="button" class="profile-trigger" id="profile-trigger" title="{{ Auth::user()->name }}">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                    </button>
+                    <div class="profile-menu" id="profile-menu">
+                        <div class="profile-info">
+                            <div class="profile-name">{{ Auth::user()->name }}</div>
+                            <div class="profile-email">{{ Auth::user()->email }}</div>
+                        </div>
+                        <!-- Settings Section (Language & Theme toggle) -->
+                        <div class="profile-settings-section">
+                            <div class="setting-item">
+                                <span class="setting-label" id="profile-txt-lang-label">Language / ભાષા / भाषा</span>
+                                <div class="switcher" id="profile-lang-switcher">
+                                    <button data-lang="gu" class="{{ $currentLang === 'gu' ? 'active' : '' }}">ગુજરાતી</button>
+                                    <button data-lang="hi" class="{{ $currentLang === 'hi' ? 'active' : '' }}">हिन्दी</button>
+                                    <button data-lang="en" class="{{ $currentLang === 'en' ? 'active' : '' }}">English</button>
+                                </div>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label" id="profile-txt-theme-label">Theme / થીમ / थीम</span>
+                                <div class="switcher" id="profile-theme-switcher">
+                                    <button data-theme-val="light" id="profile-btn-theme-light">Light</button>
+                                    <button data-theme-val="dark" class="active" id="profile-btn-theme-dark">Dark</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-links">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="btn-logout-danger">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                    <span data-localize="logout_btn" id="txt-logout-btn">Logout</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1280,7 +1537,8 @@
                 tableTitle: "તમામ નોંધણીઓ",
                 emptyTitle: "કોઈ ડેટા ઉપલબ્ધ નથી",
                 emptyDesc: "હાલમાં કોઈ વસ્તી ગણતરી સબમિટ કરવામાં આવી નથી. કૃપા કરીને પ્રારંભ કરવા માટે ફોર્મમાં ડેટા ઉમેરો.",
-                trashedTableTitle: "કચરાપેટીમાં રહેલા પત્રકો (Trashed Records)"
+                trashedTableTitle: "કચરાપેટીમાં રહેલા પત્રકો (Trashed Records)",
+                logout: "લૉગ આઉટ"
             },
             hi: {
                 title: "जनगणना डेटा डाउनलोड",
@@ -1293,7 +1551,8 @@
                 tableTitle: "सभी प्रविष्टियां",
                 emptyTitle: "कोई डेटा उपलब्ध नहीं है",
                 emptyDesc: "वर्तमान में कोई जनगणना प्रपत्र जमा नहीं किया गया है। कृपया प्रारंभ करने के लिए फ़ॉर्म में डेटा जोड़ें।",
-                trashedTableTitle: "हटाए गए रिकॉर्ड्स (Trashed Records)"
+                trashedTableTitle: "हटाए गए रिकॉर्ड्स (Trashed Records)",
+                logout: "लॉग आउट"
             },
             en: {
                 title: "Download Census Data",
@@ -1306,7 +1565,8 @@
                 tableTitle: "All Submissions",
                 emptyTitle: "No Data Available",
                 emptyDesc: "No census submissions have been recorded yet. Please add data in the census form to get started.",
-                trashedTableTitle: "Trashed Records (Trash Bin)"
+                trashedTableTitle: "Trashed Records (Trash Bin)",
+                logout: "Logout"
             }
         };
 
@@ -1368,11 +1628,10 @@
         };
 
         // Theme Engine
-        const themeButtons = document.querySelectorAll('#theme-switcher button');
+        const themeButtons = document.querySelectorAll('[data-theme-val]');
         function setTheme(theme) {
             themeButtons.forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.querySelector(`[data-theme-val="${theme}"]`);
-            if (activeBtn) activeBtn.classList.add('active');
+            document.querySelectorAll(`[data-theme-val="${theme}"]`).forEach(btn => btn.classList.add('active'));
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('user-theme', theme);
         }
@@ -1387,7 +1646,7 @@
         });
 
         // Language Changer Engine
-        const langButtons = document.querySelectorAll('#lang-switcher button');
+        const langButtons = document.querySelectorAll('[data-lang]');
         let currentLang = '{{ $currentLang }}';
 
         function updateUILanguage(lang) {
@@ -1395,7 +1654,7 @@
             localStorage.setItem('user-lang', lang);
             document.documentElement.setAttribute('lang', lang);
 
-            langButtons.forEach(btn => {
+            document.querySelectorAll('[data-lang]').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.getAttribute('data-lang') === lang) {
                     btn.classList.add('active');
@@ -1414,7 +1673,8 @@
                 'txt-table-title': dict.tableTitle,
                 'txt-empty-title': dict.emptyTitle,
                 'txt-empty-desc': dict.emptyDesc,
-                'txt-trashed-table-title': dict.trashedTableTitle
+                'txt-trashed-table-title': dict.trashedTableTitle,
+                'txt-logout': dict.logout
             };
 
             for (const [id, val] of Object.entries(elMapping)) {
@@ -1429,7 +1689,7 @@
             if (pdfLabel) pdfLabel.textContent = dict.pdf;
         }
 
-        langButtons.forEach(btn => {
+        document.querySelectorAll('[data-lang]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const selectedLang = btn.getAttribute('data-lang');
                 
@@ -1770,6 +2030,65 @@
                 });
             });
         });
+    </script>
+
+
+    <script>
+        // Toggle profile floating menu
+        const profileTrigger = document.getElementById('profile-trigger');
+        const profileMenu = document.getElementById('profile-menu');
+        if (profileTrigger && profileMenu) {
+            profileTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (!profileMenu.contains(e.target) && e.target !== profileTrigger) {
+                    profileMenu.classList.remove('show');
+                }
+            });
+        }
+
+        // Auto-refresh CSRF token and keep session alive in the background
+        function keepSessionAlive() {
+            fetch('/session-keep-alive')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Keep alive request failed');
+                })
+                .then(data => {
+                    const newToken = data.token;
+                    
+                    // Update CSRF token in meta tag
+                    const metaToken = document.querySelector('meta[name="csrf-token"]');
+                    if (metaToken) {
+                        metaToken.setAttribute('content', newToken);
+                    }
+                    
+                    // Update CSRF token in all form hidden inputs
+                    document.querySelectorAll('input[name="_token"]').forEach(input => {
+                        input.value = newToken;
+                        input.defaultValue = newToken;
+                    });
+
+                    // Update jQuery AJAX setup
+                    if (window.$ && $.ajaxSetup) {
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': newToken
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error keeping session alive:', error);
+                });
+        }
+
+        // Ping every 10 minutes (600,000 milliseconds)
+        setInterval(keepSessionAlive, 600000);
     </script>
 </body>
 </html>

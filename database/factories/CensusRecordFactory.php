@@ -57,6 +57,7 @@ class CensusRecordFactory extends Factory
         }
 
         return [
+            'user_id' => \App\Models\User::first()?->id ?? \App\Models\User::factory(),
             'mode' => $mode,
             'line_no' => $this->faker->unique()->numberBetween(1, 10000),
             'house_no' => strtoupper($this->faker->bothify('?-###')),

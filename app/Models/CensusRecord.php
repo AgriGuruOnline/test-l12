@@ -30,6 +30,7 @@ class CensusRecord extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'user_id',
         'mode',
         'line_no',
         'house_no',
@@ -73,6 +74,7 @@ class CensusRecord extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'user_id' => 'integer',
         'line_no' => 'integer',
         'household_no' => 'integer',
         'total_members' => 'integer',
@@ -80,4 +82,23 @@ class CensusRecord extends Model
         'married_couples' => 'integer',
         'vehicles' => 'array', // Cast JSON to PHP array automatically
     ];
+
+    /**
+     * The "booted" method of the model.
+     * Automatically scopes queries and sets user association.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function ($record) {
+            if (auth()->check() && !$record->user_id) {
+                $record->user_id = auth()->id();
+            }
+        });
+
+        static::addGlobalScope('user_records', function ($builder) {
+            if (auth()->check()) {
+                $builder->where('census_records.user_id', auth()->id());
+            }
+        });
+    }
 }

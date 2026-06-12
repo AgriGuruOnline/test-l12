@@ -129,6 +129,8 @@
 
         /* Top Bar with Language Switcher & Theme toggle */
         .top-bar {
+            position: relative;
+            z-index: 200;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -580,19 +582,18 @@
                 flex: 1 1 100%;
             }
             .top-bar {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 1rem;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding: 0.75rem 1rem !important;
             }
             .bar-left {
-                justify-content: center;
-                width: 100%;
+                width: auto !important;
             }
             .bar-right {
-                flex-direction: column;
-                width: 100%;
-                gap: 0.75rem;
+                flex-direction: row !important;
+                width: auto !important;
+                gap: 0.5rem !important;
             }
             .switcher-group {
                 width: 100%;
@@ -1066,6 +1067,26 @@
             .modal-body {
                 padding: 1.5rem;
             }
+            .profile-widget {
+                position: relative !important;
+            }
+            .profile-menu {
+                left: auto !important;
+                right: 0 !important;
+                width: 250px !important;
+                top: 48px !important;
+                margin-top: 8px !important;
+                transform-origin: top right !important;
+            }
+            /* Hide settings in header on mobile */
+            .top-bar .switcher-group {
+                display: none !important;
+            }
+            /* Show settings in profile dropdown on mobile */
+            .profile-settings-section {
+                display: flex !important;
+                flex-direction: column !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1075,6 +1096,182 @@
                 left: 1rem;
                 width: calc(100vw - 2rem);
             }
+        }
+
+        /* Header Profile Widget */
+        .profile-widget {
+            position: relative;
+            z-index: 100;
+            font-family: inherit;
+        }
+        .profile-trigger {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .profile-trigger:hover {
+            transform: scale(1.05);
+            background-color: #4338ca;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.5);
+        }
+        .profile-menu {
+            position: absolute;
+            top: 48px;
+            right: 0;
+            width: 260px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), var(--card-shadow);
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            transform-origin: top right;
+            animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .profile-menu.show {
+            display: flex;
+        }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .profile-info {
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 12px;
+            text-align: left;
+        }
+        .profile-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-title);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profile-email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .profile-links {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: var(--text-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            text-align: left;
+        }
+        .profile-link:hover {
+            background-color: var(--toggle-bg);
+            color: var(--text-title);
+        }
+        .btn-logout-danger {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            background-color: #e11d48;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2);
+        }
+        .btn-logout-danger:hover {
+            background-color: #be123c;
+            box-shadow: 0 6px 16px rgba(225, 29, 72, 0.4);
+        }
+        .profile-settings-section {
+            display: none; /* Hidden by default (on desktop) */
+            border-bottom: 1px solid var(--card-border);
+            padding: 12px 0;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .profile-settings-section .switcher-group,
+        .profile-settings-section .switcher {
+            display: flex !important;
+            flex-direction: row !important;
+            width: 100% !important;
+            background: var(--toggle-bg) !important;
+            border: 1px solid var(--toggle-border) !important;
+            padding: 4px !important;
+            border-radius: 12px !important;
+            gap: 2px !important;
+        }
+        .profile-settings-section .switch-btn,
+        .profile-settings-section .switcher button {
+            flex: 1 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 6px 8px !important;
+            border-radius: 8px !important;
+            font-size: 0.75rem !important;
+            cursor: pointer !important;
+            color: var(--text-body) !important;
+            transition: var(--transition) !important;
+            box-sizing: border-box !important;
+        }
+        .profile-settings-section .switch-btn.active,
+        .profile-settings-section .switcher button.active {
+            background: var(--toggle-active-bg) !important;
+            color: var(--text-title) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+            border: none !important;
+        }
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+        }
+        .setting-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -1096,6 +1293,8 @@
                 <span data-localize="nav_download_data">ડાઉનલોડ કરો</span>
             </a>
 
+
+
             <!-- Language Switcher -->
             <div class="switcher-group" id="lang-switcher">
                 <button class="switch-btn" data-lang="gu">ગુજરાતી</button>
@@ -1111,6 +1310,50 @@
                 <button class="switch-btn" data-theme-val="dark">
                     <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
+            </div>
+
+            <!-- Profile Widget -->
+            <div class="profile-widget" id="profile-widget">
+                <button type="button" class="profile-trigger" id="profile-trigger" title="{{ Auth::user()->name }}">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 2)) }}
+                </button>
+                <div class="profile-menu" id="profile-menu">
+                    <div class="profile-info">
+                        <div class="profile-name">{{ Auth::user()->name }}</div>
+                        <div class="profile-email">{{ Auth::user()->email }}</div>
+                    </div>
+                    <!-- Settings Section (Language & Theme toggle) -->
+                    <div class="profile-settings-section">
+                        <div class="setting-item">
+                            <span class="setting-label">Language / ભાષા / भाषा</span>
+                            <div class="switcher-group" id="profile-lang-switcher">
+                                <button class="switch-btn" data-lang="gu">ગુજરાતી</button>
+                                <button class="switch-btn" data-lang="hi">हिन्दी</button>
+                                <button class="switch-btn" data-lang="en">English</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Theme / થીમ / थीम</span>
+                            <div class="switcher-group" id="profile-theme-switcher">
+                                <button class="switch-btn" data-theme-val="light">
+                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                                </button>
+                                <button class="switch-btn" data-theme-val="dark">
+                                    <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-links">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn-logout-danger">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                <span data-localize="logout_btn">Logout</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1144,7 +1387,7 @@
     </div>
 
     <!-- Main Registration Form -->
-    <form id="census-form" class="census-form" action="#" method="POST" novalidate>
+    <form id="census-form" class="census-form" action="#" method="POST" autocomplete="off" novalidate>
         @csrf
         <input type="hidden" name="record_id" id="record-id" value="">
         <input type="hidden" name="mode" id="form-mode" value="house">
@@ -1158,7 +1401,7 @@
                         <span class="question-number">1</span>
                         <span data-localize="q1_label">લીટી નં:</span>
                     </label>
-                    <input type="number" id="q1" name="line_no" class="form-input tracking-input" placeholder="e.g. 1">
+                    <input type="number" id="q1" name="line_no" class="form-input tracking-input" placeholder="e.g. 1" autocomplete="off">
                 </div>
 
                 <!-- 2. House No -->
@@ -1168,7 +1411,7 @@
                         <span data-localize="q2_label">મકાન નં:</span>
                     </label>
                     <div style="position: relative; width: 100%;">
-                        <input type="text" id="q2" name="house_no" class="form-input tracking-input" placeholder="e.g. A-102" style="padding-right: 2.5rem;">
+                        <input type="text" id="q2" name="house_no" class="form-input tracking-input" placeholder="e.g. A-102" style="padding-right: 2.5rem;" required autocomplete="off">
                         <div id="house-loader" class="input-loader" style="display: none;"></div>
                     </div>
                 </div>
@@ -1179,7 +1422,7 @@
                         <span class="question-number">3</span>
                         <span data-localize="q3_label">જન ગણના ઘર નં:</span>
                     </label>
-                    <input type="text" id="q3" name="census_house_no" class="form-input tracking-input" placeholder="e.g. CH-990">
+                    <input type="text" id="q3" name="census_house_no" class="form-input tracking-input" placeholder="e.g. CH-990" autocomplete="off">
                 </div>
 
                 <!-- 4. Floor Material -->
@@ -1338,7 +1581,7 @@
                         <span class="question-number">9</span>
                         <span data-localize="q9_label">કુટુંબ નં:</span>
                     </label>
-                    <input type="number" id="q9" name="household_no" class="form-input tracking-input" placeholder="e.g. 15">
+                    <input type="number" id="q9" name="household_no" class="form-input tracking-input" placeholder="e.g. 15" autocomplete="off">
                 </div>
 
                 <!-- 10. Total Persons -->
@@ -1347,7 +1590,7 @@
                         <span class="question-number">10</span>
                         <span data-localize="q10_label">વ્યક્તિ (સભ્યોની સંખ્યા):</span>
                     </label>
-                    <input type="number" id="q10" name="total_members" class="form-input tracking-input" placeholder="e.g. 5">
+                    <input type="number" id="q10" name="total_members" class="form-input tracking-input" placeholder="e.g. 5" autocomplete="off">
                 </div>
 
                 <!-- 11. Head of Household -->
@@ -1356,7 +1599,7 @@
                         <span class="question-number">11</span>
                         <span data-localize="q11_label">મુખ્ય માણસ (કુટુંબના વડાનું નામ):</span>
                     </label>
-                    <input type="text" id="q11" name="head_name" class="form-input tracking-input" placeholder="e.g. Rameshbhai Patel">
+                    <input type="text" id="q11" name="head_name" class="form-input tracking-input" placeholder="e.g. Rameshbhai Patel" autocomplete="off">
                 </div>
 
                 <!-- 12. Gender of Head -->
@@ -1435,7 +1678,7 @@
                         <span class="question-number">15</span>
                         <span data-localize="q15_label">ઓરડા:</span>
                     </label>
-                    <input type="number" id="q15" name="dwelling_rooms" class="form-input tracking-input" placeholder="e.g. 3">
+                    <input type="number" id="q15" name="dwelling_rooms" class="form-input tracking-input" placeholder="e.g. 3" autocomplete="off">
                 </div>
 
                 <!-- 16. Married Couples -->
@@ -1444,7 +1687,7 @@
                         <span class="question-number">16</span>
                         <span data-localize="q16_label">દંપતિ (પરિણીત યુગલોની સંખ્યા):</span>
                     </label>
-                    <input type="number" id="q16" name="married_couples" class="form-input tracking-input" placeholder="e.g. 1">
+                    <input type="number" id="q16" name="married_couples" class="form-input tracking-input" placeholder="e.g. 1" autocomplete="off">
                 </div>
 
                 <!-- 17. Drinking Water Source -->
@@ -1553,7 +1796,7 @@
                         <span class="question-number">21</span>
                         <span data-localize="q21_label">પ્રકાર (શૌચાલયનો પ્રકાર):</span>
                     </label>
-                    <input type="text" id="q21" name="latrine_type" class="form-input tracking-input" placeholder="e.g. Flush/Pit">
+                    <input type="text" id="q21" name="latrine_type" class="form-input tracking-input" placeholder="e.g. Flush/Pit" autocomplete="off">
                 </div>
 
                 <!-- 22. Waste Water Disposal -->
@@ -1806,7 +2049,7 @@
                         <span class="question-number">34</span>
                         <span data-localize="q34_label">મો.નં:</span>
                     </label>
-                    <input type="tel" id="q34" name="mobile_no" class="form-input tracking-input" placeholder="e.g. 9876543210" maxlength="10" inputmode="numeric">
+                    <input type="tel" id="q34" name="mobile_no" class="form-input tracking-input" placeholder="e.g. 9876543210" maxlength="10" inputmode="numeric" autocomplete="off">
                 </div>
             </div>
 
@@ -1819,6 +2062,9 @@
             </div>
         </div>
     </form>
+    <div style="text-align: center; margin-top: 0.75rem; margin-bottom: 0.25rem; font-size: 0.72rem; color: var(--text-muted); opacity: 0.65;">
+        Developed by <a href="https://chwebtech.in" target="_blank" style="color: inherit; text-decoration: underline;">Harshit Chavda | CH Web Technologies</a>
+    </div>
 </div>
 
 <!-- Confirmation Modal Overlay -->
@@ -1856,12 +2102,11 @@
 
 <script>
     // Theme Engine Setup
-    const themeButtons = document.querySelectorAll('#theme-switcher button');
+    const themeButtons = document.querySelectorAll('[data-theme-val]');
     
     function setTheme(theme) {
         themeButtons.forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.querySelector(`[data-theme-val="${theme}"]`);
-        if (activeBtn) activeBtn.classList.add('active');
+        document.querySelectorAll(`[data-theme-val="${theme}"]`).forEach(btn => btn.classList.add('active'));
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('user-theme', theme);
     }
@@ -1895,6 +2140,63 @@
                 btn.classList.add('active');
             }
         });
+
+        // Apply or remove "required" attributes dynamically based on the mode
+        const isHouse = mode === 'house';
+        
+        // 1. Text, number, tel inputs (except q2 house_no which is always required)
+        const textInputs = ['q1', 'q3', 'q9', 'q10', 'q11', 'q15', 'q16', 'q34'];
+        textInputs.forEach(id => {
+            const inputEl = document.getElementById(id);
+            if (inputEl) {
+                if (isHouse) {
+                    inputEl.setAttribute('required', 'required');
+                } else {
+                    inputEl.removeAttribute('required');
+                }
+            }
+        });
+
+        // q21 (latrine type) is conditionally required in house mode
+        const q21 = document.getElementById('q21');
+        if (q21) {
+            if (isHouse) {
+                const facility = document.querySelector('input[name="latrine_facility"]:checked')?.value;
+                if (facility === 'private' || facility === 'shared') {
+                    q21.setAttribute('required', 'required');
+                } else {
+                    q21.removeAttribute('required');
+                }
+            } else {
+                q21.removeAttribute('required');
+            }
+        }
+
+        // 2. Radio groups to toggle required on (all except vehicles checkbox group)
+        const radioGroups = [
+            'floor_material', 'wall_material', 'roof_material', 'house_use', 'house_condition',
+            'head_gender', 'social_category', 'ownership', 'drinking_water', 'water_availability',
+            'lighting_source', 'latrine_facility', 'drainage_system', 'bathroom_facility',
+            'kitchen_facility', 'cooking_fuel', 'has_radio', 'has_tv', 'has_internet', 'has_pc',
+            'phone_type', 'has_car', 'main_cereal'
+        ];
+        radioGroups.forEach(name => {
+            const radios = document.querySelectorAll(`input[name="${name}"]`);
+            radios.forEach(radio => {
+                if (isHouse) {
+                    radio.setAttribute('required', 'required');
+                } else {
+                    radio.removeAttribute('required');
+                }
+            });
+        });
+
+        // Always clear error styling when switching modes to avoid stuck validation states
+        $('.tracking-input').each(function() {
+            if (typeof clearFieldStyle === 'function') {
+                clearFieldStyle(this);
+            }
+        });
         
         if (!triggerSearch && typeof lastSearchedMode !== 'undefined') {
             lastSearchedMode = mode;
@@ -1903,6 +2205,10 @@
         // At this moment all fields remain displayed as requested.
         if (triggerSearch && typeof checkHouseRecord === 'function') {
             checkHouseRecord();
+        }
+
+        if (typeof calculateProgress === 'function') {
+            calculateProgress();
         }
     }
 
@@ -1934,6 +2240,7 @@
             submit_button: "માહિતી સબમિટ કરો",
             submit_success: "વસ્તી ગણતરી ફોર્મ સફળતાપૂર્વક સબમિટ કરવામાં આવ્યું છે!",
             nav_download_data: "ડેટા ડાઉનલોડ",
+            logout_btn: "લૉગ આઉટ",
 
             mode_house: "મકાન (House)",
             mode_shop: "દુકાન (Shop)",
@@ -2095,6 +2402,7 @@
             submit_button: "डेटा जमा करें",
             submit_success: "जनगणना फॉर्म सफलतापूर्वक जमा कर दिया गया है!",
             nav_download_data: "डेटा डाउनलोड",
+            logout_btn: "लॉग आउट",
 
             mode_house: "मकान (House)",
             mode_shop: "दुकान (Shop)",
@@ -2256,6 +2564,7 @@
             submit_button: "Submit Information",
             submit_success: "Census form submitted successfully!",
             nav_download_data: "Download Data",
+            logout_btn: "Logout",
 
             mode_house: "House",
             mode_shop: "Shop",
@@ -2412,7 +2721,7 @@
         document.documentElement.setAttribute('lang', lang);
         
         // Active button highlight
-        document.querySelectorAll('#lang-switcher button').forEach(btn => {
+        document.querySelectorAll('[data-lang]').forEach(btn => {
             btn.classList.remove('active');
             if (btn.getAttribute('data-lang') === lang) {
                 btn.classList.add('active');
@@ -2464,7 +2773,7 @@
     }
 
     // Initialize switcher events
-    document.querySelectorAll('#lang-switcher button').forEach(btn => {
+    document.querySelectorAll('[data-lang]').forEach(btn => {
         btn.addEventListener('click', () => {
             setLanguage(btn.getAttribute('data-lang'));
             calculateProgress();
@@ -2700,6 +3009,19 @@
         this.value = val;
     });
 
+    // Update required status of q21 (latrine_type) dynamically when latrine_facility selection changes
+    $(document).on('change', 'input[name="latrine_facility"]', function() {
+        const value = this.value;
+        const q21 = document.getElementById('q21');
+        if (q21) {
+            if (currentMode === 'house' && (value === 'private' || value === 'shared')) {
+                q21.setAttribute('required', 'required');
+            } else {
+                q21.removeAttribute('required');
+                clearFieldStyle(q21);
+            }
+        }
+    });
 
 
     // Form submit interceptor with Confirmation Modal and AJAX submission
@@ -3198,5 +3520,64 @@
     // Set initial mode on startup after all references are initialized
     setMode(currentMode, false);
 </script>
+
+
+    <script>
+        // Toggle profile floating menu
+        const profileTrigger = document.getElementById('profile-trigger');
+        const profileMenu = document.getElementById('profile-menu');
+        if (profileTrigger && profileMenu) {
+            profileTrigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (!profileMenu.contains(e.target) && e.target !== profileTrigger) {
+                    profileMenu.classList.remove('show');
+                }
+            });
+        }
+
+        // Auto-refresh CSRF token and keep session alive in the background
+        function keepSessionAlive() {
+            fetch('/session-keep-alive')
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error('Keep alive request failed');
+                })
+                .then(data => {
+                    const newToken = data.token;
+                    
+                    // Update CSRF token in meta tag
+                    const metaToken = document.querySelector('meta[name="csrf-token"]');
+                    if (metaToken) {
+                        metaToken.setAttribute('content', newToken);
+                    }
+                    
+                    // Update CSRF token in all form hidden inputs
+                    document.querySelectorAll('input[name="_token"]').forEach(input => {
+                        input.value = newToken;
+                        input.defaultValue = newToken;
+                    });
+
+                    // Update jQuery AJAX setup
+                    if (window.$ && $.ajaxSetup) {
+                        $.ajaxSetup({
+                            headers: {
+                                'X-CSRF-TOKEN': newToken
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error keeping session alive:', error);
+                });
+        }
+
+        // Ping every 10 minutes (600,000 milliseconds)
+        setInterval(keepSessionAlive, 600000);
+    </script>
 </body>
 </html>
